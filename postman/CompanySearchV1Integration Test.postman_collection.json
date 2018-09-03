@@ -1,0 +1,874 @@
+{
+	"info": {
+		"_postman_id": "c9de6fc6-305e-4f2d-9758-cacceaa59c98",
+		"name": "CompanySearchV1Integration Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Happy flow",
+			"item": [
+				{
+					"name": "SearchBasedONCompanyName",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "749d0da3-ad78-40e1-b829-862b5be4fdcb",
+								"type": "text/javascript",
+								"exec": [
+									"var requestBody = JSON.parse(pm.request.body.raw);",
+									"",
+									"pm.test (\"Mandatory Field check in request body to be pass\", function () {",
+									"",
+									"    pm.expect(requestBody.name.length).to.be.above(3);",
+									"    pm.expect(requestBody.countryCode).to.be.not.empty;",
+									"});",
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "b203cfde-c607-48b6-8392-f306dd5fe49d",
+								"type": "text/javascript",
+								"exec": [
+									"// --Utils",
+									"var responseBody = pm.globals.get(\"jsonData\");",
+									"var _ = require('lodash');",
+									"",
+									"pm.test(\"Status code is 200 and OK\", function () {",
+									"    pm.response.to.have.status(200) && pm.response.to.have.status(\"OK\");",
+									"});",
+									"",
+									"pm.test(\"Response body is json \", function() {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test(\"Response succes to be true\", function() {",
+									"    pm.expect(pm.globals.get(\"jsonData\").success).to.equal(true);",
+									"});",
+									"",
+									"pm.test(\"Response should have only the countryCode which was entered in requestBody\", function() {",
+									"    var foundCountryCode = responseBody.companies.map(company => company.address.country.isoCountryCode);",
+									"    pm.expect(foundCountryCode.includes(\"US\")).to.equal(true);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{valid-password}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{valid-username}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userId\": 326260,\r\n  \"name\": \"Amazon.com, Inc.\",\r\n  \"address1\": \"410 Terry Ave N\",\r\n  \"address2\": \"string\",\r\n  \"city\": \"Seattle\",\r\n  \"countryCode\": \"US\",\r\n  \"state\": \"WA\",\r\n  \"postalCode\": \"98109\"\r\n}"
+						},
+						"url": {
+							"raw": "{{context}}/{{base-url}}/{{action-search}}",
+							"host": [
+								"{{context}}"
+							],
+							"path": [
+								"{{base-url}}",
+								"{{action-search}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SearchBasedOnIdentifier",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "d78a4d82-75c0-4851-ba26-4a80548243c8",
+								"type": "text/javascript",
+								"exec": [
+									"var requestBody = JSON.parse(pm.request.body.raw);",
+									"",
+									"pm.test(\"Mandatory Field check in request body to be pass\", function () {",
+									"    pm.expect(requestBody.searchType).to.not.be.empty;",
+									"    pm.expect(requestBody.searchTerm).to.not.be.empty;",
+									"});"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "c6153a80-a98e-48b5-b578-fbc5b126d6c7",
+								"type": "text/javascript",
+								"exec": [
+									"// --Utils",
+									"var responseBody = pm.globals.get(\"jsonData\");",
+									"var _ = require('lodash');",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response body is json \", function() {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test(\"Response succes to be true\", function() {",
+									"    pm.expect(pm.globals.get(\"jsonData\").success).to.equal(true);",
+									"});",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "{{valid-password}}",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "{{valid-username}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userId\": \"{{valid-userId}}\",\r\n  \"searchType\": \"TICKER\",\r\n  \"searchTerm\": \"{{valid-searchTerm}}\"\r\n}"
+						},
+						"url": {
+							"raw": "{{context}}/{{base-url}}/{{action-searchByIdentifier}}",
+							"host": [
+								"{{context}}"
+							],
+							"path": [
+								"{{base-url}}",
+								"{{action-searchByIdentifier}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Negative flow",
+			"item": [
+				{
+					"name": "SearchBasedOnCompanyNameFail_check",
+					"item": [
+						{
+							"name": "AuthFail_check",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "a173297d-e521-4e27-8b1a-f43ff2477ab5",
+										"type": "text/javascript",
+										"exec": [
+											"var _ = require('lodash');",
+											"",
+											"pm.test(\"Status code is 401\", function () {",
+											"    console.log(pm)",
+											"    pm.response.to.have.status(401);",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "{{invalid-password}}",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "{{invalid-username}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"userId\": \"{{valid-userId}}\",\r\n  \"name\": \"Amazon.com, Inc.\",\r\n  \"address1\": \"410 Terry Ave N\",\r\n  \"address2\": \"string\",\r\n  \"city\": \"Seattle\",\r\n  \"countryCode\": \"{{valid-country-code}}\",\r\n  \"state\": \"WA\",\r\n  \"postalCode\": \"98109\"\r\n}"
+								},
+								"url": {
+									"raw": "{{context}}/{{base-url}}/{{action-search}}",
+									"host": [
+										"{{context}}"
+									],
+									"path": [
+										"{{base-url}}",
+										"{{action-search}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "UserIdInvalidFail_check",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "7350ec57-946b-4fda-acd4-08866a4cd975",
+										"type": "text/javascript",
+										"exec": [
+											"// --Utils",
+											"var responseBody = JSON.parse(responseBody);",
+											"var _ = require('lodash');",
+											"var invalidUserId = pm.environment.get(\"invalid-userId\");",
+											"",
+											"console.log(\"userId\" + invalidUserId);",
+											"",
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400) && pm.response.to.have.status(\"Bad Request\");",
+											"});",
+											"",
+											"pm.test(\"Response body is json \", function() {",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"pm.test(\"Response succes to be false\", function() {",
+											"    pm.expect(responseBody.success).to.equal(false);",
+											"});",
+											"",
+											"pm.test(\"Error Response should have the invalid id in the message\", function() {",
+											"    console.log(responseBody.errors)",
+											"    pm.expect(responseBody.errors[0].message).to.include(invalidUserId);",
+											"});",
+											""
+										]
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "5f1e4343-1d46-403d-bcab-71f49de78ade",
+										"type": "text/javascript",
+										"exec": [
+											"var requestBody = JSON.parse(pm.request.body.raw);",
+											"",
+											"pm.test (\"Mandatory Field check in request body to be pass\", function () {",
+											"",
+											"    pm.expect(requestBody.name.length).to.be.above(3);",
+											"    pm.expect(requestBody.countryCode).to.be.not.empty;",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "{{valid-password}}",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "{{valid-username}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"userId\": \"{{invalid-userId}}\",\r\n  \"name\": \"Amazon.com, Inc.\",\r\n  \"address1\": \"410 Terry Ave N\",\r\n  \"address2\": \"string\",\r\n  \"city\": \"Seattle\",\r\n  \"countryCode\": \"{{valid-country-code}}\",\r\n  \"state\": \"WA\",\r\n  \"postalCode\": \"98109\"\r\n}"
+								},
+								"url": {
+									"raw": "{{context}}/{{base-url}}/{{action-search}}",
+									"host": [
+										"{{context}}"
+									],
+									"path": [
+										"{{base-url}}",
+										"{{action-search}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "500ServerError_check",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "8e24e6e9-9901-40ad-9fdd-eeed68e6b3f3",
+										"type": "text/javascript",
+										"exec": [
+											"var responseBody = JSON.parse(responseBody);",
+											"var _ = require('lodash');",
+											"var invalidUserId = pm.environment.get(\"invalid-userId\");",
+											"",
+											"console.log(\"userId\" + invalidUserId);",
+											"",
+											"pm.test(\"Status code is 500\", function () {",
+											"    pm.response.to.have.status(500) && pm.response.to.have.status(\"Internal Server Error\");",
+											"});",
+											"",
+											"pm.test(\"Response body is json \", function () {",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"pm.test(\"Response succes to be false\", function () {",
+											"    pm.expect(responseBody.success).to.equal(false);",
+											"});",
+											"",
+											"pm.test(\"Response error has the proper errorType\", function () {",
+											"    pm.expect(responseBody.errors[0].errorType).to.include(\"Internal Error\");",
+											"});",
+											""
+										]
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "5f1e4343-1d46-403d-bcab-71f49de78ade",
+										"type": "text/javascript",
+										"exec": [
+											"var requestBody = JSON.parse(pm.request.body.raw);",
+											"",
+											"pm.test (\"Mandatory Field check in request body to be pass\", function () {",
+											"",
+											"    pm.expect(requestBody.name.length).to.be.above(3);",
+											"    pm.expect(requestBody.countryCode).to.be.not.empty;",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "{{valid-password}}",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "{{valid-username}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"userId\": \"{{valid-userId}}\",\r\n  \"name\": \"c.aa\",\r\n  \"address1\": \"410 Terry Ave N\",\r\n  \"address2\": \"string\",\r\n  \"city\": \"Seattle\",\r\n  \"countryCode\": \"{{valid-country-code}}\",\r\n  \"state\": \"WA\",\r\n  \"postalCode\": \"98109\"\r\n}"
+								},
+								"url": {
+									"raw": "{{context}}/{{base-url}}/{{action-search}}",
+									"host": [
+										"{{context}}"
+									],
+									"path": [
+										"{{base-url}}",
+										"{{action-search}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "InvalidName&InvaildCountryCodeFail_check",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "ed304fb5-e53f-4527-9a7d-c63fd96e5ccc",
+										"type": "text/javascript",
+										"exec": [
+											"// --Utils",
+											"var responseBody = JSON.parse(responseBody);",
+											"var _ = require('lodash');",
+											"var invalidUserId = pm.environment.get(\"invalid-userId\");",
+											"",
+											"console.log(\"userId\" + invalidUserId);",
+											"",
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400) && pm.response.to.have.status(\"Bad Request\");",
+											"});",
+											"",
+											"pm.test(\"Response body is json \", function () {",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"pm.test(\"Response succes to be false\", function () {",
+											"    pm.expect(responseBody.success).to.equal(false);",
+											"});",
+											"",
+											"pm.test(\"Response should contain 2 error messages\", function () {",
+											"    var errorMessage = responseBody.errors.map(error => error.message);",
+											"    console.log(errorMessage);",
+											"    pm.expect(errorMessage.length).to.equal(2);",
+											"});",
+											""
+										]
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "5640933d-cec5-4934-8fae-975dd024b374",
+										"type": "text/javascript",
+										"exec": [
+											"var requestBody = JSON.parse(pm.request.body.raw);",
+											"",
+											"pm.test (\"Mandatory Field check in request body to be fail\", function () {",
+											"",
+											"    pm.expect(requestBody.name.length).to.be.below(3);",
+											"    pm.expect(requestBody.countryCode).to.be.empty;",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "{{valid-password}}",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "{{valid-username}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"userId\": \"{{valid-userId}}\",\r\n  \"name\": \"c.\",\r\n  \"address1\": \"410 Terry Ave N\",\r\n  \"address2\": \"string\",\r\n  \"city\": \"Seattle\",\r\n  \"countryCode\": \"\",\r\n  \"state\": \"WA\",\r\n  \"postalCode\": \"98109\"\r\n}"
+								},
+								"url": {
+									"raw": "{{context}}/{{base-url}}/{{action-search}}",
+									"host": [
+										"{{context}}"
+									],
+									"path": [
+										"{{base-url}}",
+										"{{action-search}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "SearchBasedOnCompanyByIdentifierFail_check",
+					"item": [
+						{
+							"name": "AuthFail_check",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "dd143308-7a6e-4f49-bdd5-a22ffbde4351",
+										"type": "text/javascript",
+										"exec": [
+											"var _ = require('lodash');",
+											"",
+											"pm.test(\"Status code is 401\", function () {",
+											"    console.log(pm)",
+											"    pm.response.to.have.status(401);",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "{{invalid-password}}",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "{{invalid-username}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"userId\": 326260,\r\n  \"searchType\": \"TICKER\",\r\n  \"searchTerm\": \"{{valid-searchTerm}}\"\r\n}"
+								},
+								"url": {
+									"raw": "{{context}}/{{base-url}}/{{action-searchByIdentifier}}",
+									"host": [
+										"{{context}}"
+									],
+									"path": [
+										"{{base-url}}",
+										"{{action-searchByIdentifier}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "InvalidUserIdFail_check",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "c2ce0830-df24-4e57-97d1-4f5ff9620b32",
+										"type": "text/javascript",
+										"exec": [
+											"// --Utils",
+											"var responseBody = JSON.parse(responseBody);",
+											"var _ = require('lodash');",
+											"var invalidUserId = pm.environment.get(\"invalid-userId\");",
+											"",
+											"console.log(\"userId\" + invalidUserId);",
+											"",
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400) && pm.response.to.have.status(\"Bad Request\");",
+											"});",
+											"",
+											"pm.test(\"Response body is json \", function() {",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"pm.test(\"Response succes to be false\", function() {",
+											"    pm.expect(responseBody.success).to.equal(false);",
+											"});",
+											"",
+											"pm.test(\"Error Response has the invaild id in the message\", function() {",
+											"    console.log(responseBody.errors)",
+											"    pm.expect(responseBody.errors[0].message).to.include(invalidUserId);",
+											"});",
+											""
+										]
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "b0885a3f-b785-4358-a484-c3ddb244f603",
+										"type": "text/javascript",
+										"exec": [
+											"var requestBody = JSON.parse(pm.request.body.raw);",
+											"",
+											"pm.test(\"Mandatory Field check in request body to be pass\", function () {",
+											"    pm.expect(requestBody.searchType).to.not.be.empty;",
+											"    pm.expect(requestBody.searchTerm).to.not.be.empty;",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "{{valid-password}}",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "{{valid-username}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"userId\": \"{{invalid-userId}}\",\r\n  \"searchType\": \"TICKER\",\r\n  \"searchTerm\": \"{{valid-searchTerm}}\"\r\n}"
+								},
+								"url": {
+									"raw": "{{context}}/{{base-url}}/{{action-searchByIdentifier}}",
+									"host": [
+										"{{context}}"
+									],
+									"path": [
+										"{{base-url}}",
+										"{{action-searchByIdentifier}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "500ServerError_check",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "38bef2ed-9969-4f32-99e5-a912e0328b9c",
+										"type": "text/javascript",
+										"exec": [
+											"// --Utils",
+											"var responseBody = JSON.parse(responseBody);",
+											"var _ = require('lodash');",
+											"var invalidUserId = pm.environment.get(\"invalid-userId\");",
+											"",
+											"console.log(\"userId\" + invalidUserId);",
+											"",
+											"pm.test(\"Status code is 500\", function () {",
+											"    pm.response.to.have.status(500) && pm.response.to.have.status(\"Internal Server Error\");",
+											"});",
+											"",
+											"pm.test(\"Response body is json \", function() {",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"pm.test(\"Response succes to be false\", function() {",
+											"    pm.expect(responseBody.success).to.equal(false);",
+											"});",
+											"",
+											"pm.test(\"Error Response has the invaild id in the message\", function() {",
+											"    console.log(responseBody.errors)",
+											"    pm.expect(responseBody.errors[0].message).to.include(\"TICKER\");",
+											"});",
+											""
+										]
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "8fdb61eb-1250-4057-8b7d-d9cb1c426358",
+										"type": "text/javascript",
+										"exec": [
+											"var requestBody = JSON.parse(pm.request.body.raw);",
+											"",
+											"pm.test(\"Mandatory Field check in request body to be fail\", function () {",
+											"    pm.expect(requestBody.searchType).to.be.empty;",
+											"    pm.expect(requestBody.searchTerm).to.not.be.empty;",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "{{valid-password}}",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "{{valid-username}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"userId\": \"{{valid-userId}}\",\r\n  \"searchType\": \"\",\r\n  \"searchTerm\": \"{{valid-searchTerm}}\"\r\n}"
+								},
+								"url": {
+									"raw": "{{context}}/{{base-url}}/{{action-searchByIdentifier}}",
+									"host": [
+										"{{context}}"
+									],
+									"path": [
+										"{{base-url}}",
+										"{{action-searchByIdentifier}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SearchTermEmptyFail_check",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "88f945aa-ddf4-4698-9295-49167fcec260",
+										"type": "text/javascript",
+										"exec": [
+											"// --Utils",
+											"var responseBody = JSON.parse(responseBody);",
+											"var _ = require('lodash');",
+											"",
+											"pm.test(\"Status code is 400\", function () {",
+											"    pm.response.to.have.status(400) && pm.response.to.have.status(\"Bad Request\");",
+											"});",
+											"",
+											"pm.test(\"Response body is json \", function() {",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"pm.test(\"Response succes to be false\", function() {",
+											"    pm.expect(responseBody.success).to.equal(false);",
+											"});",
+											"",
+											"pm.test(\"Error Response should have the valid message\", function() {",
+											"    console.log(responseBody.errors)",
+											"    pm.expect(responseBody.errors[0].message).to.equal(\"searchTerm is required\");",
+											"});",
+											""
+										]
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "176b2d64-3601-45d5-bdcf-97ea312de6ff",
+										"type": "text/javascript",
+										"exec": [
+											"var requestBody = JSON.parse(pm.request.body.raw);",
+											"",
+											"pm.test(\"Mandatory Field check in request body to be fail\", function () {",
+											"    pm.expect(requestBody.searchType).to.not.be.empty;",
+											"    pm.expect(requestBody.searchTerm).to.be.empty;",
+											"});"
+										]
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "basic",
+									"basic": [
+										{
+											"key": "password",
+											"value": "{{valid-password}}",
+											"type": "string"
+										},
+										{
+											"key": "username",
+											"value": "{{valid-username}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"userId\": \"{{valid-userId}}\",\r\n  \"searchType\": \"TICKER\",\r\n  \"searchTerm\": \"\"\r\n}"
+								},
+								"url": {
+									"raw": "{{context}}/{{base-url}}/{{action-searchByIdentifier}}",
+									"host": [
+										"{{context}}"
+									],
+									"path": [
+										"{{base-url}}",
+										"{{action-searchByIdentifier}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		}
+	]
+}

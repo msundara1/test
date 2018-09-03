@@ -1,0 +1,447 @@
+{
+	"info": {
+		"_postman_id": "c464acec-97c2-4f7b-bdce-0e737d980b39",
+		"name": "UsersV1InegrationTest",
+		"description": "Test the flow for the Users.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "get_auth_token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "44aa3b50-af9e-4c67-a29a-1c855e603b19",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"response body is json\", function(){",
+							"   pm.response.to.be.json; ",
+							"});",
+							"",
+							"var json = pm.response.json();",
+							"",
+							"pm.test(\"response body contains accessToken\", function (){",
+							"   pm.expect(json.accessToken.length).to.above(1);",
+							"});",
+							"",
+							"pm.globals.set(\"authToken\", json.accessToken);",
+							"",
+							"console.log(pm.globals.get(\"authToken\"));",
+							"",
+							"pm.globals.set(\"tenantId\", json.tenants[0].tenantId);",
+							"",
+							"console.log(pm.globals.get(\"tenantId\"));",
+							"",
+							"pm.globals.set(\"userId\", json.userId);",
+							"",
+							"console.log(pm.globals.get(\"userId\"));",
+							"",
+							"//generate guid for partnerId and cache in variable for remaining tests.",
+							"",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"test-collections-user@billtrust.com\",\r\n  \"password\": \"Testing1234!\"\r\n}"
+				},
+				"url": {
+					"raw": "{{AUTHENTICATION_URL}}/v1/login",
+					"host": [
+						"{{AUTHENTICATION_URL}}"
+					],
+					"path": [
+						"v1",
+						"login"
+					]
+				},
+				"description": "Gets the authenticated token"
+			},
+			"response": []
+		},
+		{
+			"name": "get_user_byid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bf118ccc-a7aa-491a-8a60-ca9b957ee49b",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"     pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response body is json\", function () {",
+							"     pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"response body is expected record\", function () {",
+							"     var json = pm.response.json();",
+							"       pm.expect(json.id).to.equal(pm.variables.get(\"userId\"));",
+							"       ",
+							"       pm.globals.set(\"personId\", json.personId);",
+							"",
+							"       console.log(pm.globals.get(\"personId\"));",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Billtrust-Auth",
+						"value": "{{authToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/v1/tenants/{{tenantId}}/users/{{userId}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"tenants",
+						"{{tenantId}}",
+						"users",
+						"{{userId}}"
+					]
+				},
+				"description": "Retrieve the User."
+			},
+			"response": []
+		},
+		{
+			"name": "get_users_byid_throws_recordnotfound",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "29127e7c-b622-4a4c-829c-632778e7736f",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is not found\", function () {",
+							"    if(pm.expect(pm.response.code).to.be.oneOf([404]))",
+							"    {",
+							"        console.log(\"Id\" + \"{{invalidUserId}}\" + \"not found for type Users\");",
+							"    }",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Billtrust-Auth",
+						"value": "{{authToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/v1/tenants/{{tenantId}}/users/{{invalidUserId}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"tenants",
+						"{{tenantId}}",
+						"users",
+						"{{invalidUserId}}"
+					]
+				},
+				"description": "Failed to retrieve the users."
+			},
+			"response": []
+		},
+		{
+			"name": "get_user_for_tenant",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "73da308d-5472-4eac-bc55-8ed75389b6d6",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"     pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"response body is json\", function () {",
+							"     pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"response body is json array\", function () {",
+							"     var json = pm.response.json();",
+							"      pm.expect(json.length).to.above(-1);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-Billtrust-Auth",
+						"value": "{{authToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/v1/tenants/{{tenantId}}/users",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"tenants",
+						"{{tenantId}}",
+						"users"
+					]
+				},
+				"description": "Get the list of users for the tenant."
+			},
+			"response": []
+		},
+		{
+			"name": "update_user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "67a701f4-e9e3-4f1e-a88b-4a89929aa367",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"response body is json \", function() {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"Users : \"+ pm.variables.get(\"userId\") + \" Updated\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.id).to.equal(pm.variables.get(\"userId\"));",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-Billtrust-Auth",
+						"value": "{{authToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"personId\": \"{{personId}}\",\r\n\t\"preference\": null,\r\n\t\"active\": true,\r\n\t\"firstName\": \"Collections\",\r\n\t\"lastName\": \"Admin\",\r\n\t\"email\": \"test-collections-user@billtrust.com\",\r\n\t\"officePhone\": null,\r\n\t\"cellPhone\": null,\r\n\t\"fax\": null,\r\n\t\"title\": \"test\",\r\n\t\"address1\": null,\r\n\t\"address2\": null,\r\n\t\"city\": null,\r\n\t\"state\": null,\r\n\t\"zip\": null,\r\n\t\"country\": null,\r\n\t\"language\": null,\r\n\t\"timezone\": null\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/v1/tenants/{{tenantId}}/users/{{userId}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"tenants",
+						"{{tenantId}}",
+						"users",
+						"{{userId}}"
+					]
+				},
+				"description": "Update user"
+			},
+			"response": []
+		},
+		{
+			"name": "update_users_throws_recordnotfound",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ccef6147-b53b-4e01-9e73-f9b932e7e99e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is not found\", function() {",
+							"    if(pm.expect(pm.response.code).to.be.oneOf([404]))",
+							"    {",
+							"        console.log(\"Id\" + \"{{invalid_disputeactor_id}}\" + \"not found for type Dispute actor\");",
+							"    }",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-Billtrust-Auth",
+						"value": "{{authToken}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"id\": \"b50e94ad-3a91-424a-aeba-6c7d79df11b8\",\r\n\t\"personId\": 8602,\r\n\t\"preference\": null,\r\n\t\"active\": true,\r\n\t\"firstName\": \"Collections\",\r\n\t\"lastName\": \"Admin\",\r\n\t\"email\": \"test-collections-admin@billtrust.com\",\r\n\t\"officePhone\": null,\r\n\t\"cellPhone\": null,\r\n\t\"fax\": null,\r\n\t\"title\": \"test\",\r\n\t\"address1\": null,\r\n\t\"address2\": null,\r\n\t\"city\": null,\r\n\t\"state\": null,\r\n\t\"zip\": null,\r\n\t\"country\": null,\r\n\t\"language\": null,\r\n\t\"timezone\": null\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/v1/tenants/{{tenantId}}/users/{{invalidUserId}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"tenants",
+						"{{tenantId}}",
+						"users",
+						"{{invalidUserId}}"
+					]
+				},
+				"description": "Failed to update users we created"
+			},
+			"response": []
+		},
+		{
+			"name": "release_auth_token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6f3fbc76-fd72-41a5-85ba-96f5de3fb720",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Log out\", function () {",
+							"     pm.response.to.have.status(204);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"accessToken\": \"{{authToken}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{AUTHENTICATION_URL}}/v1/logout",
+					"host": [
+						"{{AUTHENTICATION_URL}}"
+					],
+					"path": [
+						"v1",
+						"logout"
+					]
+				},
+				"description": "Release the auth token"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "9a6f1212-d490-4bb9-8322-39b6efdb9e35",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "f5888a63-1240-4f3f-b97d-9f18d3836b1a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "49a87572-f9df-477c-aeab-f170ceac2f78",
+			"key": "AUTHENTICATION_URL",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "ddf79a44-9812-4f9f-9a44-d61d5b90a03f",
+			"key": "BASE_URL",
+			"value": "",
+			"type": "string",
+			"description": ""
+		},
+		{
+			"id": "2ddf151f-932a-429d-aae4-e6c356db9ceb",
+			"key": "invalidTenantId",
+			"value": "-1",
+			"type": "string",
+			"description": ""
+		},
+		{
+			"id": "97e1785c-8248-47cb-b505-f2aff13bd850",
+			"key": "invalidUserId",
+			"value": "-1",
+			"type": "string",
+			"description": ""
+		}
+	]
+}

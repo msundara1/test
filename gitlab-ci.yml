@@ -1,0 +1,8 @@
+image: centos:7
+
+stages:
+  - build
+
+job1:
+  stage: build
+  script: ci/build.sh

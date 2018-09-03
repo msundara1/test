@@ -1,0 +1,291 @@
+{
+	"info": {
+		"_postman_id": "7058069e-ccb2-47e0-85e2-3bf940522672",
+		"name": "UsersInegrationTest",
+		"description": "Integration test for Users API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create_Users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e300c43e-0195-40a3-988c-8b8529722bb2",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function () {",
+							"     pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"response body is json \",function(){",
+							"   pm.response.to.be.json; ",
+							"    ",
+							"});",
+							"pm.test(\"response body contains id\",function(){",
+							"   pm.response.to.have.jsonBody(\"userID\");",
+							"});",
+							"pm.test(\"Get Id\",function(){ ",
+							"  var jsonResponse = pm.response.json();",
+							"  pm.globals.set(\"id\",jsonResponse.userID);",
+							"  ",
+							"});",
+							"",
+							"pm.test(\"Test User Created Location\",function() {",
+							"    var HdrLocation = pm.response.headers.get(\"Location\");",
+							"    pm.expect(HdrLocation).to.be.equal(pm.variables.get(\"BASE_URL\") + \"/api/v1\"+",
+							"    \"/users/\" + pm.globals.get(\"id\"));",
+							"",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"login\": \"test login12\",\r\n  \"isActive\": true,\r\n  \"preference\": \"test\",\r\n  \"firstName\": \"testfirst\",\r\n  \"lastName\": \"testlast\",\r\n  \"emailId\": \"testlast12@email.com\",\r\n  \"officePhone\": \"454545\",\r\n  \"cellPhone\": \"454545\",\r\n  \"fax\": \"565656\",\r\n  \"title\": \" \",\r\n  \"address1\": \"test addr\",\r\n  \"address2\": \"test addtr\",\r\n  \"city\": \"LA\",\r\n  \"state\": \"CA\",\r\n  \"zip\": \"56566\",\r\n  \"country\": \"USA\",\r\n  \"language\": \"en\",\r\n  \"timeZone\": \"utc-7.00\",\r\n  \"roles\": [\r\n    {\r\n      \r\n      \"code\": \"T21\",\r\n      \"description\": \"Test T21\",\r\n      \"beId\": \"{{beid}}\"\r\n    }\r\n  ],\r\n  \"portfolios\": [\r\n    {\r\n      \r\n      \"code\": \"T2 port1\",\r\n      \"description\": \"Test portT21\",\r\n      \"beId\": \"{{beid}}\",\r\n      \"isActive\": true\r\n    }\r\n  ],\r\n  \"businessEntity\": [\r\n    {\r\n      \r\n      \"code\": \"test entity1\",\r\n      \"description\": \"test entity biz1\",\r\n      \"address1\": \"addr1\",\r\n      \"address2\": \"addr2\",\r\n      \"city\": \"LA\",\r\n      \"state\": \"CA\",\r\n      \"zip\": \"45454\",\r\n      \"country\": \"USA\",\r\n      \"baseCurrency\": \"USD\",\r\n      \"clientId\": 1234\r\n    }\r\n  ]\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/v1/users",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get_Users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "55a37b23-7b8f-4b04-83d4-9dd834267cb6",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"response body is json \", function() {",
+							"    pm.response.to.be.json;",
+							"});",
+							"pm.test(\"response body is json array and atleast one record\", function () {",
+							"     var json = pm.response.json();",
+							"      pm.expect(json.length).to.above(-1);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{BASE_URL}}/api/v1/users",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get_Users_ById",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f887acd1-96e6-4b49-a3c8-c447e8e6bb14",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"response body is json \", function() {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"response body is expected record\", function () {",
+							"     var json = pm.response.json();",
+							"       pm.expect(json.userID).to.equal(pm.globals.get(\"id\"));",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{BASE_URL}}/api/v1/users/{{id}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update_Users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d6dc4c84-0210-4b84-aa61-2f623fa36d99",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"response is ok\", function() {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"response body is json \", function() {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"User Deatils with : \"+ pm.globals.get(\"id\") + \" Updated\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.userID).to.equal(pm.globals.get(\"id\"));",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"userID\": \"{{id}}\",\r\n  \"login\": \"test login1\",\r\n  \"isActive\": true,\r\n  \"preference\": \"test preference\",\r\n  \"firstName\": \"testfirst\",\r\n  \"lastName\": \"testlast\",\r\n  \"emailId\": \"testlast@email.com\",\r\n  \"officePhone\": \"454546\",\r\n  \"cellPhone\": \"454546\",\r\n  \"fax\": \"565656\",\r\n  \"title\": \" \",\r\n  \"address1\": \"test addr\",\r\n  \"address2\": \"test addtr\",\r\n  \"city\": \"LA\",\r\n  \"state\": \"CA\",\r\n  \"zip\": \"56566\",\r\n  \"country\": \"USA\",\r\n  \"language\": \"en\",\r\n  \"timeZone\": \"utc-7.00\",\r\n  \"roles\": [\r\n    {\r\n      \r\n      \"code\": \"T21\",\r\n      \"description\": \"Test T21\",\r\n      \"beId\": \"{{beid}}\"\r\n    }\r\n  ],\r\n  \"portfolios\": [\r\n    {\r\n      \r\n      \"code\": \"T2 port1\",\r\n      \"description\": \"Test portT21\",\r\n      \"beId\": \"{{beid}}\",\r\n      \"isActive\": true\r\n    }\r\n  ],\r\n  \"businessEntity\": [\r\n    {\r\n      \r\n      \"code\": \"test entity1\",\r\n      \"description\": \"test entity biz1\",\r\n      \"address1\": \"addr1\",\r\n      \"address2\": \"addr2\",\r\n      \"city\": \"LA\",\r\n      \"state\": \"CA\",\r\n      \"zip\": \"45454\",\r\n      \"country\": \"USA\",\r\n      \"baseCurrency\": \"USD\",\r\n      \"clientId\": 1234\r\n    }\r\n  ]\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/v1/users",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete_User_ById",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "607ded9e-1714-427d-ad85-72a2b7b8e65b",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Deleted User - Id  : \" + pm.globals.get(\"id\"), function () {",
+							"     pm.response.to.have.status(204);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{BASE_URL}}/api/v1/users/{{id}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"{{id}}"
+					]
+				},
+				"description": "Deletes user by id"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "1ca454ae-9e92-49ee-abd1-6e787e5286f3",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "c38fc269-98e3-474d-b827-16a0b873ac54",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "cce11fcd-bd0f-4603-8cb3-f550e25b26f3",
+			"key": "BASE_URL",
+			"value": "http://localhost:5000",
+			"type": "string",
+			"description": ""
+		},
+		{
+			"id": "3f63c185-460e-4e43-a9b2-bb23e189cc57",
+			"key": "beid",
+			"value": "F16F3B1C-8221-46CA-9CB4-5430CF81F3AD",
+			"type": "string",
+			"description": ""
+		}
+	]
+}

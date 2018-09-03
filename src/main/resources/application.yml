@@ -1,0 +1,46 @@
+spring:
+  profiles.active: h2
+spring.jmx:
+   enabled: false
+server:
+  port: 9800
+  context-path: /${project.name}/
+  environment_name: ${cba_environment}
+security:
+  basic:
+    enabled: false
+management:
+  port: 8801
+  context-path: /manage
+  security:
+    enabled: false
+project:
+  name:  creditapp-services
+  artifactId: @project.artifactId@
+  version: @project.version@
+logging:
+  file: /var/log/${project.name}/${project.name}.log
+  pattern:
+    console: "%d %-5level %logger : %msg%n"
+    file: "%d %-5level [%thread] %logger : %msg%n"
+  level:
+    org.springframework.web: INFO
+    org.hibernate: DEBUG
+---
+
+spring.profiles: h2
+
+spring.datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:creditapp;MODE=MySQL
+    username: sa
+    password: sa
+spring.jpa:
+  show-sql: true
+  hibernate:
+    dialect: org.hibernate.dialect.H2Dialect
+    ddl-auto: update
+    naming:
+      physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  properties:
+    hibernate.format_sql: true

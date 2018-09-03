@@ -1,0 +1,8 @@
+[template]
+src = "appsettings.tmpl"
+dest = "appsettings.json"
+keys = [
+    "/bt",
+    "/aws",
+    "/app"
+]

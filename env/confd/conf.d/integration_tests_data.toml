@@ -1,0 +1,8 @@
+[template]
+src = "integration_tests_data.tmpl"
+dest = "/postman/integration_tests_data.json"
+keys = [
+    "/bt",
+    "/aws",
+    "/app"
+]

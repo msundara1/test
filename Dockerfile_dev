@@ -1,0 +1,11 @@
+# Start with a base image containing Maven and Java
+FROM maven:3.5-jdk-8-alpine
+CMD {"Installed maven, jdk"]
+
+WORKDIR /app
+
+ADD target/creditapp-service.jar creditapp-service.jar
+
+EXPOSE 443
+
+ENTRYPOINT ["java", "-jar", "creditapp-service.jar"]
